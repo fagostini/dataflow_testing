@@ -1,0 +1,12 @@
+[submodule "BioMate"]
+	path = BioMate
+	url = git@github.com:fagostini/BioMate.git
+[submodule "genomics-status"]
+	path = genomics-status
+	url = git@github.com:fagostini/genomics-status.git
+[submodule "StatusDB_NGI"]
+	path = StatusDB_NGI
+	url = git@github.com:NationalGenomicsInfrastructure/StatusDB_NGI.git
+[submodule "Yggdrasil"]
+	path = Yggdrasil
+	url = git@github.com:NationalGenomicsInfrastructure/Yggdrasil.git
