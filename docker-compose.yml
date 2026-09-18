@@ -1,0 +1,128 @@
+# Testing environment for the Yggdrasil workflow.
+#
+#   make compose-up        # statusdb + biomate + yggdrasil
+#   make compose-up-full   # the above + genomics-status (--profile full)
+#   make compose-logs      # follow yggdrasil logs
+#   make compose-reset     # tear everything down, including volumes
+#
+# Yggdrasil starts only after its dependencies are healthy (compose
+# depends_on) and its entrypoint verifies the seeded databases exist,
+# creates its own databases, and (by default) injects a test scenario
+# that the daemon then picks up, generates a plan for, and executes.
+
+name: dataflow-testing
+
+services:
+  statusdb:
+    image: dataflow-statusdb:latest
+    build:
+      context: ./StatusDB_NGI
+      dockerfile: Dockerfile
+    environment:
+      # Stack-specific variable names (STACK_*) so we never pick up
+      # unrelated COUCHDB_* variables from the ambient shell environment.
+      COUCHDB_USER: ${STACK_COUCH_USER:-admin}
+      COUCHDB_PASSWORD: ${STACK_COUCH_PASSWORD:-secret}
+    ports:
+      - "5984:5984"
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+    networks:
+      - yggdrasil-net
+
+  biomate:
+    image: dataflow-biomate:latest
+    build:
+      context: ./BioMate
+      dockerfile: Dockerfile
+    command: ["biomate", "web-interface", "--host", "0.0.0.0", "--port", "8765"]
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    ports:
+      - "8765:8765"
+    # No curl in this image; use python for the healthcheck.
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/', timeout=5)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 20s
+    networks:
+      - yggdrasil-net
+
+  genomics-status:
+    image: dataflow-genomics-status:latest
+    # Source + configs are baked into the image (see
+    # deploy/Dockerfile.genomics-status, which builds on top of the image
+    # produced by the submodule's Dockerfile). No bind mounts: the submodule
+    # working tree must never be written to at runtime.
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.genomics-status
+    profiles: ["full"]
+    ports:
+      - "9761:9761"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/opt/conda/bin/python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9761/', timeout=5)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+    depends_on:
+      statusdb:
+        condition: service_healthy
+    networks:
+      - yggdrasil-net
+
+  yggdrasil:
+    image: dataflow-yggdrasil:latest
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.yggdrasil
+    environment:
+      YGG_COUCH_USER: ${STACK_COUCH_USER:-admin}
+      YGG_COUCH_PASS: ${STACK_COUCH_PASSWORD:-secret}
+      YGG_COUCH_URL: http://statusdb:5984
+      YGG_WORK_ROOT: /work
+      YGG_EVENT_SPOOL: /events
+      OPS_DB: yggdrasil_ops
+      YGG_INJECT_TEST_SCENARIO: ${YGG_INJECT_TEST_SCENARIO:-true}
+      YGG_SCENARIO_ID: ${YGG_SCENARIO_ID:-test_scenario:compose-demo}
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ygg-work:/work
+      - ygg-events:/events
+      - ygg-logs:/logs/yggdrasil
+    depends_on:
+      statusdb:
+        condition: service_healthy
+      biomate:
+        condition: service_healthy
+    networks:
+      - yggdrasil-net
+
+networks:
+  yggdrasil-net:
+
+volumes:
+  couchdb-data:
+  ygg-work:
+  ygg-events:
+  ygg-logs:

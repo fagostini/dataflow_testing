@@ -1,0 +1,58 @@
+{
+    "yggdrasil": {
+        "log_dir": "/logs/yggdrasil",
+        "job_monitor_poll_interval": 60,
+        "plan_watcher_poll_interval": 5
+    },
+    "external_systems": {
+        "endpoints": {
+            "couchdb": {
+                "backend": "couchdb",
+                "url": "http://statusdb:5984",
+                "auth": {
+                    "user_env": "YGG_COUCH_USER",
+                    "pass_env": "YGG_COUCH_PASS"
+                }
+            }
+        },
+        "connections": {
+            "projects_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "projects"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                }
+            },
+            "yggdrasil_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "yggdrasil"
+                },
+                "data_access": {
+                    "realm_allowlist": ["test_realm"],
+                    "max_limit": 50
+                }
+            },
+            "yggdrasil_testdocs": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "yggdrasil"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                }
+            }
+        },
+        "defaults": {
+            "start_seq": "0"
+        }
+    }
+}

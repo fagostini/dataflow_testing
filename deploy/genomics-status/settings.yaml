@@ -1,0 +1,36 @@
+# Minimal settings for the local compose test stack (profile "full").
+# Consumed by status_app.py with CWD = run_dir.
+#
+# NOTE: couch_username/couch_password mirror the compose defaults
+# (COUCHDB_USER/COUCHDB_PASSWORD in .env). If you change those, update
+# them here as well.
+couch_server: http://admin:secret@statusdb:5984
+couch_url: http://statusdb:5984
+couch_username: admin
+couch_password: secret
+username: admin
+password: secret
+port: 9761
+redirect_uri: http://localhost:9761/login
+google_oauth:
+  key: stub-oauth-key
+  secret: stub-oauth-secret
+zendesk:
+  url: http://zendesk-mock:8080
+  username: stub@localhost
+  token: stub-zendesk-token
+jira:
+  url: http://jira-mock:8080
+  user: stub
+  api_token: stub-jira-token
+  project_key: STUB
+slack:
+  token: xoxb-stub-slack-token
+server_status:
+  # server name -> instrument name, used on the front page
+  instruments:
+    promet.scilifelab.se: "NASTest"
+reports_path: /app/reports
+lims_backend_credential_location: /app/run_dir/lims_backend_cred.yaml
+order_portal_credential_location: /app/run_dir/orderportal_cred.yaml
+font_awesome_url: https://use.fontawesome.com/releases/v5.15.4/css/all.css
