@@ -1,6 +1,6 @@
 # dataflow_testing
 
-A testing environment for the **Yggdrasil** workflow. It wires the four
+A testing environment for the **Yggdrasil** workflow. It wires the
 submodules in this repository into a single Docker Compose stack, starts
 Yggdrasil only after its dependencies are up and running, and (by default)
 fires an end-to-end test scenario so you can see the whole event-driven
@@ -42,6 +42,7 @@ execution → event/ops artifacts.
 ├── pyproject.toml / pixi.lock   # pixi workspace aggregating submodule deps
 ├── extract_deps.py / get_deps.sh
 ├── BioMate/                     # submodule
+├── demux_realm/                 # submodule (Yggdrasil realm, installs into Yggdrasil)
 ├── genomics-status/             # submodule
 ├── StatusDB_NGI/                # submodule
 └── Yggdrasil/                   # submodule
@@ -68,7 +69,7 @@ several-minute build. Subsequent builds are fast (layer caching).
 ```bash
 git clone git@github.com:fagostini/dataflow_testing.git
 cd dataflow_testing
-make init            # clone/update the four submodules
+make init            # clone/update the submodules
 make compose-up      # build + start statusdb, biomate, yggdrasil
 ```
 
@@ -247,6 +248,11 @@ by `compose-up-full`.
 |--------|---------|
 | `make compose-up` | Build + start statusdb, biomate, yggdrasil |
 | `make compose-up-full` | Same, plus genomics-status (profile `full`) |
+| `make compose-up-statusdb` | Build + start only statusdb |
+| `make compose-up-biomate` | Build + start only biomate |
+| `make compose-up-yggdrasil` | Build + start yggdrasil (also starts its deps: statusdb, biomate) |
+| `make compose-up-genomics-status` | Build + start genomics-status (profile `full`; also starts statusdb) |
+| `make compose-build-gs-base` | Build only the genomics-status base image (conda env) |
 | `make compose-logs` | Follow yggdrasil logs |
 | `make compose-ps` | Stack status |
 | `make compose-scenario` | Inject a fresh test scenario into the running stack |
@@ -255,6 +261,12 @@ by `compose-up-full`.
 
 ## Troubleshooting
 
+- **`failed to set up container networking: network … not found`** — a
+  profile-gated container (e.g. `genomics-status` from a previous
+  `compose-up-full`) was left behind when a default-profile `down` removed
+  the shared project network. The next `up` then tries to start the stranded
+  container and fails. Fix: `make compose-reset`, then `make compose-up` /
+  `make compose-up-full`.
 - **Port already in use (5984/8765/9761)** — something else is bound to the
   host port. Change the host-side port in `docker-compose.yml` (left of the
   colon) or stop the conflicting process.
@@ -282,5 +294,6 @@ by `compose-up-full`.
 |-----------|----------|-------------------|
 | `StatusDB_NGI` | [NationalGenomicsInfrastructure/StatusDB_NGI](https://github.com/NationalGenomicsInfrastructure/StatusDB_NGI) | CouchDB image + seed data (`statusdb`) |
 | `Yggdrasil` | [NationalGenomicsInfrastructure/Yggdrasil](https://github.com/NationalGenomicsInfrastructure/Yggdrasil) | The orchestration daemon under test |
+| `demux_realm` | [NationalGenomicsInfrastructure/demux_realm](https://github.com/NationalGenomicsInfrastructure/demux_realm) | Yggdrasil realm for demux planning (`dmx_realm`); installs into Yggdrasil, not part of the compose stack |
 | `BioMate` | [fagostini/BioMate](https://github.com/fagostini/BioMate) | Bio-data tooling + web interface (`biomate`) |
 | `genomics-status` | [fagostini/genomics-status](https://github.com/fagostini/genomics-status) | Status dashboard UI (`genomics-status`, profile `full`) |

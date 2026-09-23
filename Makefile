@@ -1,5 +1,5 @@
 # Submodule directories (extracted from .gitmodules)
-SUBMODULES := BioMate genomics-status StatusDB_NGI Yggdrasil
+SUBMODULES := BioMate genomics-status StatusDB_NGI Yggdrasil demux_realm
 
 help: ## Show this help
 	@echo "Usage: make [target] [TARGET]"
@@ -15,13 +15,17 @@ help: ## Show this help
 	@echo "  extract-deps   Extract deps and show how to add them via pixi"
 	@echo ""
 	@echo "Compose targets (Yggdrasil workflow testing environment):"
-	@echo "  compose-up        Build and start the stack (statusdb, biomate, yggdrasil)"
-	@echo "  compose-up-full   Same as compose-up plus genomics-status (profile full)"
-	@echo "  compose-down      Stop and remove the stack (volumes are kept)"
-	@echo "  compose-logs      Follow yggdrasil logs"
-	@echo "  compose-ps        Show stack status"
-	@echo "  compose-reset     Stop the stack and remove all volumes"
-	@echo "  compose-scenario  Inject a fresh test scenario into a running stack"
+	@echo "  compose-up                Build and start the stack (statusdb, biomate, yggdrasil)"
+	@echo "  compose-up-full           Same as compose-up plus genomics-status (profile full)"
+	@echo "  compose-up-statusdb       Build and start only statusdb"
+	@echo "  compose-up-biomate        Build and start only biomate"
+	@echo "  compose-up-yggdrasil      Build and start yggdrasil (plus its deps)"
+	@echo "  compose-up-genomics-status  Build and start genomics-status (profile full)"
+	@echo "  compose-down              Stop and remove the stack (volumes are kept)"
+	@echo "  compose-logs              Follow yggdrasil logs"
+	@echo "  compose-ps                Show stack status"
+	@echo "  compose-reset             Stop the stack and remove all volumes"
+	@echo "  compose-scenario          Inject a fresh test scenario into a running stack"
 	@echo ""
 	@echo "Per-submodule targets (replace TARGET with one of: $(SUBMODULES))"
 	@echo "  update-TARGET  Pull latest for a single submodule"
@@ -218,13 +222,28 @@ COMPOSE := docker compose
 compose-up: ## Build and start statusdb, biomate and yggdrasil
 	$(COMPOSE) up -d --build
 
-compose-up-full: ## compose-up plus genomics-status (profile "full")
-	@echo "Building genomics-status base image (conda env) from the submodule..."
+compose-build-gs-base: ## Build the genomics-status base image (conda env)
 	docker build -q -t dataflow-genomics-status-base:latest ./genomics-status
+
+compose-up-full: compose-build-gs-base ## compose-up plus genomics-status (profile "full")
 	$(COMPOSE) --profile full up -d --build
 
+# Per-service targets (mainly for testing). Compose also starts the
+# depends_on closure of the requested service.
+compose-up-statusdb: ## Build and start only statusdb
+	$(COMPOSE) up -d --build statusdb
+
+compose-up-biomate: ## Build and start only biomate
+	$(COMPOSE) up -d --build biomate
+
+compose-up-yggdrasil: ## Build and start yggdrasil (plus its deps: statusdb, biomate)
+	$(COMPOSE) up -d --build yggdrasil
+
+compose-up-genomics-status: compose-build-gs-base ## genomics-status (profile "full"; plus statusdb)
+	$(COMPOSE) --profile full up -d --build genomics-status
+
 compose-down: ## Stop and remove the stack (volumes are kept)
-	$(COMPOSE) down
+	$(COMPOSE) down --remove-orphans
 
 compose-logs: ## Follow yggdrasil logs
 	$(COMPOSE) logs -f yggdrasil
