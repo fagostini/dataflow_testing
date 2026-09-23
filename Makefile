@@ -242,8 +242,11 @@ compose-up-yggdrasil: ## Build and start yggdrasil (plus its deps: statusdb, bio
 compose-up-genomics-status: compose-build-gs-base ## genomics-status (profile "full"; plus statusdb)
 	$(COMPOSE) --profile full up -d --build genomics-status
 
+# Teardown always passes --profile full so profile-gated services
+# (genomics-status) are covered no matter how the stack was started;
+# down only acts on containers that exist.
 compose-down: ## Stop and remove the stack (volumes are kept)
-	$(COMPOSE) down --remove-orphans
+	$(COMPOSE) --profile full down --remove-orphans
 
 compose-logs: ## Follow yggdrasil logs
 	$(COMPOSE) logs -f yggdrasil
@@ -252,7 +255,7 @@ compose-ps: ## Show stack status
 	$(COMPOSE) ps
 
 compose-reset: ## Stop the stack and remove all volumes (fresh CouchDB on next up)
-	$(COMPOSE) down -v --remove-orphans
+	$(COMPOSE) --profile full down -v --remove-orphans
 
 compose-scenario: ## Inject a fresh test scenario into a running stack
 	@curl -sf -X PUT \

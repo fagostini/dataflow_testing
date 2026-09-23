@@ -262,12 +262,15 @@ by `compose-up-full`.
 
 ## Troubleshooting
 
-- **`failed to set up container networking: network … not found`** — a
-  profile-gated container (e.g. `genomics-status` from a previous
-  `compose-up-full`) was left behind when a default-profile `down` removed
-  the shared project network. The next `up` then tries to start the stranded
-  container and fails. Fix: `make compose-reset`, then `make compose-up` /
-  `make compose-up-full`.
+- **`Network … Resource is still in use`** (on `down`) or
+  **`failed to set up container networking: network … not found`** (on `up`)
+  — a profile-gated container (e.g. `genomics-status` from a previous
+  `compose-up-full`) was left behind by a default-profile `down`, keeping the
+  shared project network alive (or stranding the container without it).
+  `make compose-down` / `make compose-reset` now pass `--profile full` and
+  cover all services; if you hit this with an older checkout, run
+  `docker compose --profile full down --remove-orphans` once, then
+  `make compose-up` / `make compose-up-full`.
 - **Port already in use (5984/8765/9761)** — something else is bound to the
   host port. Change the host-side port in `docker-compose.yml` (left of the
   colon) or stop the conflicting process.
