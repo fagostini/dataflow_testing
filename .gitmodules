@@ -10,3 +10,6 @@
 [submodule "Yggdrasil"]
 	path = Yggdrasil
 	url = git@github.com:NationalGenomicsInfrastructure/Yggdrasil.git
+[submodule "demux_realm"]
+	path = demux_realm
+	url = git@github.com:NationalGenomicsInfrastructure/demux_realm.git
