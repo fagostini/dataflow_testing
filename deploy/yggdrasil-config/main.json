@@ -34,8 +34,13 @@
                     "db": "yggdrasil"
                 },
                 "data_access": {
-                    "realm_allowlist": ["test_realm"],
-                    "max_limit": 50
+                    "realms": {
+                        "test_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read", "write"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
                 }
             },
             "yggdrasil_testdocs": {
@@ -48,6 +53,63 @@
                     "include_docs": true,
                     "limit": 100,
                     "start_seq": "0"
+                }
+            },
+            "demux_sample_info_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "demux_sample_info"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                },
+                "data_access": {
+                    "realms": {
+                        "dmx_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
+                }
+            },
+            "flowcell_status_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "flowcell_status"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                },
+                "data_access": {
+                    "realms": {
+                        "dmx_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
+                }
+            },
+            "x_flowcells_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "x_flowcells"
+                },
+                "data_access": {
+                    "realms": {
+                        "dmx_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read", "write"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
                 }
             }
         },

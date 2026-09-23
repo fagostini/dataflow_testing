@@ -42,7 +42,7 @@ execution → event/ops artifacts.
 ├── pyproject.toml / pixi.lock   # pixi workspace aggregating submodule deps
 ├── extract_deps.py / get_deps.sh
 ├── BioMate/                     # submodule
-├── demux_realm/                 # submodule (Yggdrasil realm, installs into Yggdrasil)
+├── demux_realm/                 # submodule (Yggdrasil realm dmx_realm, installed in the Yggdrasil image)
 ├── genomics-status/             # submodule
 ├── StatusDB_NGI/                # submodule
 └── Yggdrasil/                   # submodule
@@ -194,7 +194,8 @@ the defaults otherwise):
 Where things live:
 
 - **Yggdrasil config**: `deploy/yggdrasil-config/main.json` (CouchDB endpoint,
-  connections `projects_db` / `yggdrasil_db` / `yggdrasil_testdocs`, poll
+  connections `projects_db` / `yggdrasil_db` / `yggdrasil_testdocs` /
+  `demux_sample_info_db` / `flowcell_status_db`, poll
   intervals). Baked into the image at the path Yggdrasil's `ConfigLoader`
   expects. If you change it, rebuild: `make compose-up`.
 - **Genomics Status stubs**: `deploy/genomics-status/` (baked in the same way).
@@ -294,6 +295,6 @@ by `compose-up-full`.
 |-----------|----------|-------------------|
 | `StatusDB_NGI` | [NationalGenomicsInfrastructure/StatusDB_NGI](https://github.com/NationalGenomicsInfrastructure/StatusDB_NGI) | CouchDB image + seed data (`statusdb`) |
 | `Yggdrasil` | [NationalGenomicsInfrastructure/Yggdrasil](https://github.com/NationalGenomicsInfrastructure/Yggdrasil) | The orchestration daemon under test |
-| `demux_realm` | [NationalGenomicsInfrastructure/demux_realm](https://github.com/NationalGenomicsInfrastructure/demux_realm) | Yggdrasil realm for demux planning (`dmx_realm`); installs into Yggdrasil, not part of the compose stack |
+| `demux_realm` | [NationalGenomicsInfrastructure/demux_realm](https://github.com/NationalGenomicsInfrastructure/demux_realm) | Yggdrasil realm for demux planning; installed into the Yggdrasil image as realm `dmx_realm` (`--no-deps`), watches the `demux_sample_info` + `flowcell_status` DBs (bootstrapped by the yggdrasil entrypoint). **Requires the Yggdrasil `dev` branch** (handler API `generate_plan_drafts`) |
 | `BioMate` | [fagostini/BioMate](https://github.com/fagostini/BioMate) | Bio-data tooling + web interface (`biomate`) |
 | `genomics-status` | [fagostini/genomics-status](https://github.com/fagostini/genomics-status) | Status dashboard UI (`genomics-status`, profile `full`) |

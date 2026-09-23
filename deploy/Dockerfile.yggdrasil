@@ -31,6 +31,14 @@ COPY Yggdrasil/ /app/
 ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.1.0
 RUN pip install -e /app
 
+# 2b) The demux_realm realm package (ygg.realm entry point: dmx_realm).
+#     --no-deps: its declared deps (prefect, pandas, click) are not imported
+#     anywhere in the package; it only uses stdlib + yggdrasil (already
+#     installed, editable, /app). Its `ygg` extra would git-install a second
+#     yggdrasil and shadow this one.
+COPY demux_realm/ /app/demux_realm/
+RUN pip install --no-deps -e /app/demux_realm
+
 # 3) Config, scenario seed and entrypoint. All files ConfigLoader resolves
 #    must live under yggdrasil_workspace/common/configurations/ (CONFIG_DIR).
 COPY deploy/yggdrasil-config/main.json /app/yggdrasil_workspace/common/configurations/main.json

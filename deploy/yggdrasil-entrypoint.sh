@@ -10,8 +10,9 @@
 #   1. CouchDB answers /_up
 #   2. the seeded `projects` database exists
 #   3. the yggdrasil / yggdrasil_plans / yggdrasil_ops databases exist
-#   4. (optional) a test scenario document is injected into the stack
-#   5. (optional) genomics-status is reachable, when it is part of this stack
+#   4. the demux_sample_info / flowcell_status databases exist (dmx_realm)
+#   5. (optional) a test scenario document is injected into the stack
+#   6. (optional) genomics-status is reachable, when it is part of this stack
 #
 # It then hands over to the requested yggdrasil command (default: `--dev daemon`).
 #
@@ -128,16 +129,20 @@ create_db "yggdrasil"
 create_db "yggdrasil_plans"
 create_db "yggdrasil_ops"
 
-# 4. Optional test scenario.
+# 4. Databases watched by the dmx_realm realm (demux_realm package).
+create_db "demux_sample_info"
+create_db "flowcell_status"
+
+# 5. Optional test scenario.
 if [ "${YGG_INJECT_TEST_SCENARIO:-true}" = "true" ]; then
     inject_scenario
 else
     log "YGG_INJECT_TEST_SCENARIO=false; not injecting a test scenario"
 fi
 
-# 5. Optional UI service (only present with --profile full).
+# 6. Optional UI service (only present with --profile full).
 wait_for_service "genomics-status" 9761 "genomics-status" 300
 
-# 6. Hand over to yggdrasil.
+# 7. Hand over to yggdrasil.
 log "Starting: yggdrasil $*"
 exec yggdrasil "$@"
