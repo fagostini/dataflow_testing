@@ -1,0 +1,4 @@
+# Stub order portal credentials for the local test stack.
+order_portal:
+  api_get_order_url: 'http://orderportal-mock:8080/orders/api/v1/order'
+  api_token: 'stub-order-portal-token'

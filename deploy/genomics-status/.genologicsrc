@@ -1,0 +1,7 @@
+# Stub LIMS (genologics) credentials for the local test stack.
+# INI format: consumed by the genologics SDK (genologics.config), which
+# looks for this file in the CWD (run_dir) or $HOME at import time.
+[genologics]
+BASEURI = http://lims-mock:8080
+USERNAME = test
+PASSWORD = test

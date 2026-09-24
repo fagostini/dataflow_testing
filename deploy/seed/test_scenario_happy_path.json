@@ -1,0 +1,6 @@
+{
+    "type": "ygg_test_scenario",
+    "name": "Compose stack smoke-test scenario",
+    "recipe": "happy_path",
+    "auto_run": true
+}

@@ -1,0 +1,8 @@
+# Stub LIMS SQL database configuration for the local test stack.
+# YAML format: consumed by the genologics_sql SDK at import time.
+# The engine is only created lazily, so no real database is contacted
+# while the app runs.
+username: test
+password: test
+url: lims-mock-db:5432
+db: lims

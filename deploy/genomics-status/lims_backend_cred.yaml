@@ -1,0 +1,5 @@
+# Stub LIMS backend credentials for the local test stack.
+# YAML format: consumed by status_app.py itself (yaml.safe_load + .get()).
+url: http://lims-mock:8080
+username: test
+password: test
