@@ -1,0 +1,28 @@
+# Genomics Status app image for the local compose test stack.
+#
+# Builds on top of the image produced by the genomics-status submodule's
+# Dockerfile (the conda/pip environment). That base is built first by the
+# `compose-up-full` Makefile target:
+#
+#     docker build -t dataflow-genomics-status-base:latest ./genomics-status
+#
+# The app source and the test-stack config files are baked in (rather than
+# bind-mounted into the host-backed run_dir) so the submodule working tree is
+# never left with placeholder files.
+FROM dataflow-genomics-status-base:latest
+
+USER root
+ENV HOME=/root
+
+# App source (pinned to the submodule checkout).
+COPY genomics-status/ /app/
+
+# Test-stack config files (CWD = /app/run_dir).
+COPY deploy/genomics-status/settings.yaml /app/run_dir/settings.yaml
+COPY deploy/genomics-status/.genologicsrc /app/run_dir/.genologicsrc
+COPY deploy/genomics-status/.genosqlrc.yaml /app/run_dir/.genosqlrc.yaml
+COPY deploy/genomics-status/lims_backend_cred.yaml /app/run_dir/lims_backend_cred.yaml
+COPY deploy/genomics-status/orderportal_cred.yaml /app/run_dir/orderportal_cred.yaml
+
+WORKDIR /app/run_dir
+CMD ["/opt/conda/bin/python", "../status_app.py", "--testing_mode", "--port=9761"]

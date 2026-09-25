@@ -1,0 +1,7 @@
+# Keeps the root build context lean. Both deploy/Dockerfile.yggdrasil and
+# deploy/Dockerfile.genomics-status build with the repository root as their
+# context, so the submodules must stay available here; only the large pixi
+# env and git metadata are excluded.
+.git/
+.gitmodules
+.pixi/
