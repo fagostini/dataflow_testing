@@ -1,0 +1,120 @@
+{
+    "yggdrasil": {
+        "log_dir": "/logs/yggdrasil",
+        "job_monitor_poll_interval": 60,
+        "plan_watcher_poll_interval": 5
+    },
+    "external_systems": {
+        "endpoints": {
+            "couchdb": {
+                "backend": "couchdb",
+                "url": "http://statusdb:5984",
+                "auth": {
+                    "user_env": "YGG_COUCH_USER",
+                    "pass_env": "YGG_COUCH_PASS"
+                }
+            }
+        },
+        "connections": {
+            "projects_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "projects"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                }
+            },
+            "yggdrasil_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "yggdrasil"
+                },
+                "data_access": {
+                    "realms": {
+                        "test_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read", "write"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
+                }
+            },
+            "yggdrasil_testdocs": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "yggdrasil_testdocs"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                }
+            },
+            "demux_sample_info_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "demux_sample_info"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                },
+                "data_access": {
+                    "realms": {
+                        "dmx_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
+                }
+            },
+            "flowcell_status_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "flowcell_status"
+                },
+                "watch": {
+                    "poll_interval": 3,
+                    "include_docs": true,
+                    "limit": 100,
+                    "start_seq": "0"
+                },
+                "data_access": {
+                    "realms": {
+                        "dmx_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
+                }
+            },
+            "x_flowcells_db": {
+                "endpoint": "couchdb",
+                "resource": {
+                    "db": "x_flowcells"
+                },
+                "data_access": {
+                    "realms": {
+                        "dmx_realm": {
+                            "planning": { "permissions": ["read"] },
+                            "execution": { "permissions": ["read", "write"] }
+                        }
+                    },
+                    "options": { "max_limit": 50 }
+                }
+            }
+        },
+        "defaults": {
+            "start_seq": "0"
+        }
+    }
+}
